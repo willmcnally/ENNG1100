@@ -15,7 +15,14 @@
 const int led = 13;
 WebServer server(80);
 
-void handleRoot() {
+bool button1Processing = false;
+bool button2Processing = false;
+// Define similar flags for other buttons if needed
+
+void handleRoot()
+{
+  if (server.method() != HTTP_GET)
+    return;
   digitalWrite(led, 1);
   String html = "<!DOCTYPE html><html><head><title>Root Page</title>";
   html += "<style>";
@@ -45,7 +52,6 @@ void handleRoot() {
   html += "<button id='button3' class='button' onclick='sendRequest(\"button3\")'>Button 3</button>";
   html += "<button id='button4' class='button' onclick='sendRequest(\"button4\")'>Button 4</button>";
   html += "</div>";
-  // Additional buttons
   html += "<div class='frame'>";
   html += "<button id='button5' class='button' onclick='sendRequest(\"button5\")'>Button 5</button>";
   html += "<button id='button6' class='button' onclick='sendRequest(\"button6\")'>Button 6</button>";
@@ -57,16 +63,19 @@ void handleRoot() {
   html += "<script>";
   html += "function sendRequest(buttonId) {";
   html += "  var button = document.getElementById(buttonId);";
-  html += "  button.disabled = true;"; // Disable the button after it's clicked
-  html += "  var xhr = new XMLHttpRequest();";
-  html += "  xhr.open('GET', '/' + buttonId);"; // Send a GET request to the server
-  html += "  xhr.onload = function() {";
-  html += "    button.disabled = false;"; // Re-enable the button after the request completes
-  html += "  };";
-  html += "  xhr.onerror = function() {"; // Handle request error
-  html += "    button.disabled = false;"; // Re-enable the button in case of error
-  html += "  };";
-  html += "  xhr.send();";
+  html += "  if (!button.disabled) {";   // Check if the button is already disabled (indicating a previous request)
+  html += "    button.disabled = true;"; // Disable the button after it's clicked
+  html += "    console.log('request sent');";
+  html += "    var xhr = new XMLHttpRequest();";
+  html += "    xhr.open('GET', '/' + buttonId);"; // Send a GET request to the server
+  html += "    xhr.onload = function() {";
+  html += "      button.disabled = false;"; // Re-enable the button after the request completes
+  html += "    };";
+  html += "    xhr.onerror = function() {"; // Handle request error
+  html += "      button.disabled = false;"; // Re-enable the button in case of error
+  html += "    };";
+  html += "    xhr.send();";
+  html += "  }";
   html += "}";
   html += "</script>";
   html += "</body></html>";
@@ -74,39 +83,80 @@ void handleRoot() {
   digitalWrite(led, 0);
 }
 
-void handleButton1() {
+void handleButton1()
+{
+  if (server.method() != HTTP_GET)
+    return;
   Serial.println("button1pressed");
+  delay(200);
 }
 
-void handleButton2() {
+void handleButton2()
+{
+  if (server.method() != HTTP_GET)
+    return;
   Serial.println("button2pressed");
+  delay(200);
 }
 
-void handleButton3() {
+void handleButton3()
+{
+  if (server.method() != HTTP_GET)
+    return;
   Serial.println("button3pressed");
+  delay(200);
 }
 
-void handleButton4() {
+void handleButton4()
+{
+  if (server.method() != HTTP_GET)
+    return;
+
   Serial.println("button4pressed");
+  delay(200);
 }
 
-void handleButton5() {
+void handleButton5()
+{
+  if (server.method() != HTTP_GET)
+    return;
+
   Serial.println("button5pressed");
+  delay(200);
 }
 
-void handleButton6() {
+void handleButton6()
+{
+  if (server.method() != HTTP_GET)
+    return;
+
   Serial.println("button6pressed");
+  delay(200);
 }
 
-void handleButton7() {
+void handleButton7()
+{
+  if (server.method() != HTTP_GET)
+    return;
+
   Serial.println("button7pressed");
+  delay(200);
 }
 
-void handleButton8() {
+void handleButton8()
+{
+  if (server.method() != HTTP_GET)
+    return;
+
   Serial.println("button8pressed");
+  delay(200);
 }
 
-void handleNotFound() {
+void handleNotFound()
+{
+  if (server.method() != HTTP_GET)
+    return;
+
   digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
@@ -116,14 +166,16 @@ void handleNotFound() {
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
+  for (uint8_t i = 0; i < server.args(); i++)
+  {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
 }
 
-void setup(void) {
+void setup(void)
+{
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
@@ -132,7 +184,8 @@ void setup(void) {
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -148,18 +201,25 @@ void setup(void) {
 
   server.on("/", handleRoot);
 
-  server.on("/inline", []() {
-    server.send(200, "text/plain", "this works as well");
-  });
+  server.on("/inline", []()
+            { server.send(200, "text/plain", "this works as well"); });
 
   server.onNotFound(handleNotFound);
-  
+
   server.begin();
   Serial.println("HTTP server started");
   server.on("/button1", handleButton1);
+  server.on("/button2", handleButton2);
+  server.on("/button3", handleButton3);
+  server.on("/button4", handleButton4);
+  server.on("/button5", handleButton5);
+  server.on("/button6", handleButton6);
+  server.on("/button7", handleButton7);
+  server.on("/button8", handleButton8);
 }
 
-void loop(void) {
+void loop(void)
+{
   server.handleClient();
-  delay(2);//allow the cpu to switch to other tasks
+  delay(2); // allow the cpu to switch to other tasks
 }

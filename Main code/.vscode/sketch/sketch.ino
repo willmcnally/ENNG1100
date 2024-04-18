@@ -30,13 +30,10 @@ void setup()
 
     for (int i = 0; i < sizeof(servos) / sizeof(servos[0]); i++)
     {
-          Serial.print("Servo: ");
+        Serial.print("Servo: ");
         Serial.print(i);
-        // Serial.print(" cm");
         Serial.println();
         servos[i].attach(servoPins[i]);
-        //    servos[i].writeMicroseconds(2000);
-        //    delay(1000);
     }
     // 1500 is no movement  of the servo
     // 2000 is anti-clockwise movement of the servo
@@ -46,13 +43,10 @@ void setup()
 void loop()
 {
 
-    for (int i = 0; i < sizeof(trigPins)/sizeof(trigPins[0]); i++)
+    for (int i = 0; i < sizeof(trigPins) / sizeof(trigPins[0]); i++)
     {
         distances[i] = getDistance(trigPins[i], echoPins[i]);
-        // Serial.print("Distance: ");
-        // Serial.print(distances[i]);
-        // Serial.print(" cm");
-        // Serial.println();
+
     }
     moveServo(0, 0, 1);
     moveServo(1, 1, 0);
@@ -79,22 +73,22 @@ float getDistance(int trigPin, int echoPin)
 
 void moveServo(int servo, int distanceSensor, int backupSensor)
 {
-        float absolute = abs(abs(startingDistances[distanceSensor] - distances[distanceSensor]) - abs(distances[backupSensor] - startingDistances[backupSensor]));
-        
-        //If positive it is closer if negative it is further away
-        float movement1 = startingDistances[distanceSensor] - distances[distanceSensor];
-        
-        float movement2 = startingDistances[backupSensor] - distances[backupSensor];
-       
-       //This checks that the position has moved 3cm from it's original position
+    float absolute = abs(abs(startingDistances[distanceSensor] - distances[distanceSensor]) - abs(distances[backupSensor] - startingDistances[backupSensor]));
+
+    // If positive it is closer if negative it is further away
+    float movement1 = startingDistances[distanceSensor] - distances[distanceSensor];
+
+    float movement2 = startingDistances[backupSensor] - distances[backupSensor];
+
+    // This checks that the position has moved 4cm from it's original position
     if (movement1 > 4)
     {
-       
+        // This checks if the sensor 
         if (movement2 < 3)
         {
-             Serial.print("This is running on servo: ");
-        Serial.print(servo);
-        Serial.println();
+            Serial.print("This is running on servo: ");
+            Serial.print(servo);
+            Serial.println();
             servos[servo].writeMicroseconds(2000);
             delay(500);
         }

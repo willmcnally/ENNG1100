@@ -1,4 +1,3 @@
-
 /**
  * BasicHTTPClient.ino
  *
@@ -7,42 +6,12 @@
  */
 
 #include <Arduino.h>
-#include <ESPmDNS.h>
+// #include <ESPmDNS.h>
 #include <WiFi.h>
 #include <WebServer.h>
 #include <HTTPClient.h>
 #define USE_SERIAL Serial
 
-/*
-const char* ca = \ 
-"-----BEGIN CERTIFICATE-----\n" \  
-"MIIEkjCCA3qgAwIBAgIQCgFBQgAAAVOFc2oLheynCDANBgkqhkiG9w0BAQsFADA/\n" \  
-"MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT\n" \  
-"DkRTVCBSb290IENBIFgzMB4XDTE2MDMxNzE2NDA0NloXDTIxMDMxNzE2NDA0Nlow\n" \  
-"SjELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUxldCdzIEVuY3J5cHQxIzAhBgNVBAMT\n" \  
-"GkxldCdzIEVuY3J5cHQgQXV0aG9yaXR5IFgzMIIBIjANBgkqhkiG9w0BAQEFAAOC\n" \  
-"AQ8AMIIBCgKCAQEAnNMM8FrlLke3cl03g7NoYzDq1zUmGSXhvb418XCSL7e4S0EF\n" \  
-"q6meNQhY7LEqxGiHC6PjdeTm86dicbp5gWAf15Gan/PQeGdxyGkOlZHP/uaZ6WA8\n" \  
-"SMx+yk13EiSdRxta67nsHjcAHJyse6cF6s5K671B5TaYucv9bTyWaN8jKkKQDIZ0\n" \  
-"Z8h/pZq4UmEUEz9l6YKHy9v6Dlb2honzhT+Xhq+w3Brvaw2VFn3EK6BlspkENnWA\n" \  
-"a6xK8xuQSXgvopZPKiAlKQTGdMDQMc2PMTiVFrqoM7hD8bEfwzB/onkxEz0tNvjj\n" \  
-"/PIzark5McWvxI0NHWQWM6r6hCm21AvA2H3DkwIDAQABo4IBfTCCAXkwEgYDVR0T\n" \  
-"AQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAYYwfwYIKwYBBQUHAQEEczBxMDIG\n" \  
-"CCsGAQUFBzABhiZodHRwOi8vaXNyZy50cnVzdGlkLm9jc3AuaWRlbnRydXN0LmNv\n" \  
-"bTA7BggrBgEFBQcwAoYvaHR0cDovL2FwcHMuaWRlbnRydXN0LmNvbS9yb290cy9k\n" \  
-"c3Ryb290Y2F4My5wN2MwHwYDVR0jBBgwFoAUxKexpHsscfrb4UuQdf/EFWCFiRAw\n" \  
-"VAYDVR0gBE0wSzAIBgZngQwBAgEwPwYLKwYBBAGC3xMBAQEwMDAuBggrBgEFBQcC\n" \  
-"ARYiaHR0cDovL2Nwcy5yb290LXgxLmxldHNlbmNyeXB0Lm9yZzA8BgNVHR8ENTAz\n" \  
-"MDGgL6AthitodHRwOi8vY3JsLmlkZW50cnVzdC5jb20vRFNUUk9PVENBWDNDUkwu\n" \  
-"Y3JsMB0GA1UdDgQWBBSoSmpjBH3duubRObemRWXv86jsoTANBgkqhkiG9w0BAQsF\n" \  
-"AAOCAQEA3TPXEfNjWDjdGBX7CVW+dla5cEilaUcne8IkCJLxWh9KEik3JHRRHGJo\n" \  
-"uM2VcGfl96S8TihRzZvoroed6ti6WqEBmtzw3Wodatg+VyOeph4EYpr/1wXKtx8/\n" \  
-"wApIvJSwtmVi4MFU5aMqrSDE6ea73Mj2tcMyo5jMd6jmeWUHK8so/joWUoHOUgwu\n" \  
-"X4Po1QYz+3dszkDqMp4fklxBwXRsW10KXzPMTZ+sOPAveyxindmjkW8lGy+QsRlG\n" \  
-"PfZ+G6Z6h7mjem0Y+iWlkYcV4PIWL1iwBi8saCbGS5jN2p8M+X+Q7UNKEkROb3N6\n" \  
-"KOqkqm57TH2H3eDJAkSnh6/DNFu0Qg==\n" \  
-"-----END CERTIFICATE-----\n";
-*/
 const int led = 13;
 WebServer server(80);
 
@@ -62,15 +31,35 @@ void handleRoot() {
   html += "  margin: 4px 2px;";
   html += "  cursor: pointer;";
   html += "}";
+  html += ".frame {";
+  html += "  display: flex;";
+  html += "  justify-content: center;";
+  html += "  align-items: center;";
+  html += "}";
   html += "</style></head><body>";
-  html += "<button id='button1' class='button' onclick='sendRequest()'>Button 1</button>";
-  // Add buttons for button 2 to button 8 in a similar manner...
+  html += "<div class='frame'>";
+  html += "<button id='button1' class='button' onclick='sendRequest(\"button1\")'>Button 1</button>";
+  html += "<button id='button2' class='button' onclick='sendRequest(\"button2\")'>Button 2</button>";
+  html += "</div>";
+  html += "<div class='frame'>";
+  html += "<button id='button3' class='button' onclick='sendRequest(\"button3\")'>Button 3</button>";
+  html += "<button id='button4' class='button' onclick='sendRequest(\"button4\")'>Button 4</button>";
+  html += "</div>";
+  // Additional buttons
+  html += "<div class='frame'>";
+  html += "<button id='button5' class='button' onclick='sendRequest(\"button5\")'>Button 5</button>";
+  html += "<button id='button6' class='button' onclick='sendRequest(\"button6\")'>Button 6</button>";
+  html += "</div>";
+  html += "<div class='frame'>";
+  html += "<button id='button7' class='button' onclick='sendRequest(\"button7\")'>Button 7</button>";
+  html += "<button id='button8' class='button' onclick='sendRequest(\"button8\")'>Button 8</button>";
+  html += "</div>";
   html += "<script>";
-  html += "function sendRequest() {";
-  html += "  var button = document.getElementById('button1');";
+  html += "function sendRequest(buttonId) {";
+  html += "  var button = document.getElementById(buttonId);";
   html += "  button.disabled = true;"; // Disable the button after it's clicked
   html += "  var xhr = new XMLHttpRequest();";
-  html += "  xhr.open('GET', '/button1');"; // Send a GET request to the server
+  html += "  xhr.open('GET', '/' + buttonId);"; // Send a GET request to the server
   html += "  xhr.onload = function() {";
   html += "    button.disabled = false;"; // Re-enable the button after the request completes
   html += "  };";
@@ -87,6 +76,34 @@ void handleRoot() {
 
 void handleButton1() {
   Serial.println("button1pressed");
+}
+
+void handleButton2() {
+  Serial.println("button2pressed");
+}
+
+void handleButton3() {
+  Serial.println("button3pressed");
+}
+
+void handleButton4() {
+  Serial.println("button4pressed");
+}
+
+void handleButton5() {
+  Serial.println("button5pressed");
+}
+
+void handleButton6() {
+  Serial.println("button6pressed");
+}
+
+void handleButton7() {
+  Serial.println("button7pressed");
+}
+
+void handleButton8() {
+  Serial.println("button8pressed");
 }
 
 void handleNotFound() {
@@ -125,9 +142,9 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp32")) {
-    Serial.println("MDNS responder started");
-  }
+  // if (MDNS.begin("esp32")) {
+  //   Serial.println("MDNS responder started");
+  // }
 
   server.on("/", handleRoot);
 

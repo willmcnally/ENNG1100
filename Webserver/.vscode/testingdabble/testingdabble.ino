@@ -203,6 +203,8 @@ void moveServo(int servo, int distanceSensor, int backupSensor)
         delay(10);
     }
 }
+
+// this code is very shit dunno what im doing with it
 // void move_servo_manual() {
 //   Dabble.processInput();             //this function is used to refresh data obtained from smartphone.Hence calling this function is mandatory in order to get data properly from your mobile.
 //   // Code to wind the servos manually

@@ -168,7 +168,7 @@ if auto == true {
 }
 
 }
-
+//
 void moveServo(int servo, int distanceSensor, int backupSensor)
 {
     float absolute = abs(abs(startingDistances[distanceSensor] - distances[distanceSensor]) - abs(distances[backupSensor] - startingDistances[backupSensor]));

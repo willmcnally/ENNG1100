@@ -19,11 +19,13 @@
 // const int echoPins[] = {21, 22};
 
 Servo servo0;
-Servo servo1;
-Servo servo2;
-Servo servo3;
-Servo servos[] = {servo0, servo1, servo2, servo3};
-const int servoPins[] = {23, 19, 5, 18};
+// Servo servo1;
+// Servo servo2;
+// Servo servo3;
+// Servo servos[] = {servo0, servo1, servo2, servo3};
+Servo servos[] = {servo0};
+// const int servoPins[] = {23, 19, 5, 18};
+const int servoPins[] = {23};
 
 // long duration;
 // float startingDistances[] = {0, 0, 0, 0};
@@ -171,11 +173,11 @@ void move_servo_man(int servoNum, bool direction) {
   if (direction == true) {
   
   servos[servoNum].writeMicroseconds(2000);
-    // delay(100);
+    delay(100);
   }
   else{
     servos[servoNum].writeMicroseconds(1000);
-    // delay(100);
+    delay(100);
   }
   // for (int i = 0; i < 4; i++)
   //   {

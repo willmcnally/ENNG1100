@@ -12,11 +12,19 @@
 #define INCLUDE_GAMEPAD_MODULE
 #include <DabbleESP32.h>
 #include <ESP32Servo.h>
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+
 // Will's Code
 
+#define SERVO_STOP  msToPulseLen(1.65) // This is the 'stop' pulse length count (out of 4096)
+#define SERVO_FWD  msToPulseLen(2.0) // This is the 'forward' pulse length count (out of 4096)
+#define SERVO_REV  msToPulseLen(1.0) // This is the 'reverse' pulse length count (out of 4096)
 #define SOUND_SPEED 0.034
 // const int trigPins[] = {19, 23};
 // const int echoPins[] = {21, 22};
+
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x44);
 
 Servo servo0;
 // Servo servo1;
@@ -32,7 +40,14 @@ const int servoPins[] = {23};
 // float distances[] = {0, 0, 0, 0};
 bool autostate = false;
 
+uint16_t msToPulseLen(float ms) {
+  return (uint16_t)((ms * 1000) / 4.07 + 0.5);
+}
+
 void setup() {
+  pwm.begin();
+  pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
+  delay(10);
   // put your setup code here, to run once:
   Serial.begin(115200);      // make sure your Serial Monitor is also set at this baud rate.
   Dabble.begin("BLUECHEESE");       //set bluetooth name of your device
@@ -58,6 +73,39 @@ void setup() {
 }
 }
 
+void moveServo(uint8_t servonum, uint8_t servo_dir) {
+  if servo_dir == 1 {
+    pwm.setPWM(servonum, 0, SERVO_FWD);
+    delay(200); // Wait for 2 seconds
+    pwm.setPWM(servonum, 0, SERVO_STOP);
+    delay(200); // Wait for 2 seconds
+  }
+  else if servo_dir == 2 {
+    pwm.setPWM(servonum, 0, SERVO_REV);
+    delay(200); // Wait for 2 seconds
+    pwm.setPWM(servonum, 0, SERVO_STOP);
+    delay(200); // Wait for 2 seconds
+  }
+  else {
+    pwm.setPWM(servonum, 0, SERVO_STOP);
+    delay(200); // Wait for 2 seconds
+  }
+  // pwm.setPWM(servonum, 0, SERVO_FWD);
+  // delay(200); // Wait for 2 seconds
+  // pwm.setPWM(servonum, 0, SERVO_STOP);
+  // delay(200); // Wait for 2 seconds
+  // pwm.setPWM(servonum, 0, SERVO_REV);
+  // delay(200); // Wait for 2 seconds
+  // pwm.setPWM(servonum, 0, SERVO_STOP);
+  // delay(200); // Wait for 2 seconds
+}
+
+void moveServosSequentially() {
+  for (uint8_t servonum = 0; servonum < 4; servonum++) {
+    moveServo(servonum);
+  }
+}
+
 void loop() {
   if (autostate == false) {
   Dabble.processInput();             //this function is used to refresh data obtained from smartphone.Hence calling this function is mandatory in order to get data properly from your mobile.
@@ -66,7 +114,7 @@ void loop() {
   {
     Serial.print("Up");
 
-    move_servo_man(0, true);
+    moveServo(0, 1);
       delay(100);
 
   }
@@ -75,7 +123,7 @@ if (GamePad.isDownPressed())
   {
     Serial.print("Down");
     
-    move_servo_man(2, true);
+    moveServo(2, 1)
       delay(100);
 
   }
@@ -84,7 +132,7 @@ if (GamePad.isLeftPressed())
   {
     Serial.print("Left");
 
-    move_servo_man(3, true);
+    moveServo(3, 1);
       delay(100);
 
   }
@@ -93,7 +141,7 @@ if (GamePad.isRightPressed())
   {
     Serial.print("Right");
 
-    move_servo_man(1, true);
+    moveServo(1, 1);
       delay(100);
 
   }
@@ -102,7 +150,7 @@ if (GamePad.isSquarePressed())
   {
     Serial.print("Square");
   
-  move_servo_man(3, false);
+  moveServo(3, 2);
     delay(100);
 
   }
@@ -111,7 +159,7 @@ if (GamePad.isCirclePressed())
   {
     Serial.print("Circle");
 
-    move_servo_man(1, false);
+    moveServo(1, 2);
       delay(100);
 
   }
@@ -121,7 +169,7 @@ if (GamePad.isCrossPressed())
   {
     Serial.print("Cross");
 
-  move_servo_man(2, false);
+  moveServo(2, 2);
     delay(100);
 
   }
@@ -130,7 +178,7 @@ if (GamePad.isTrianglePressed())
   {
     Serial.print("Triangle");
   
-  move_servo_man(0, false);
+  moveServo(0, 2);
   delay(100);
   }
 

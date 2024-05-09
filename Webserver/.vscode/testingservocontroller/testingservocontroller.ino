@@ -19,13 +19,13 @@ void setup() {
 
 void moveServo(uint8_t servonum) {
   pwm.setPWM(servonum, 0, SERVO_FWD);
-  delay(2000); // Wait for 2 seconds
+  delay(200); // Wait for 2 seconds
   pwm.setPWM(servonum, 0, SERVO_STOP);
-  delay(2000); // Wait for 2 seconds
+  delay(200); // Wait for 2 seconds
   pwm.setPWM(servonum, 0, SERVO_REV);
-  delay(2000); // Wait for 2 seconds
+  delay(200); // Wait for 2 seconds
   pwm.setPWM(servonum, 0, SERVO_STOP);
-  delay(2000); // Wait for 2 seconds
+  delay(200); // Wait for 2 seconds
 }
 
 void moveServosSequentially() {

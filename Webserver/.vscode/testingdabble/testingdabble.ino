@@ -74,21 +74,21 @@ void setup() {
 }
 
 void moveServo(uint8_t servonum, uint8_t servo_dir) {
-  if servo_dir == 1 {
+  if (servo_dir == 1) {
     pwm.setPWM(servonum, 0, SERVO_FWD);
-    delay(200); // Wait for 2 seconds
+    delay(20); // Wait for 2 seconds
     pwm.setPWM(servonum, 0, SERVO_STOP);
-    delay(200); // Wait for 2 seconds
+    delay(20); // Wait for 2 seconds
   }
-  else if servo_dir == 2 {
+  else if (servo_dir == 2) {
     pwm.setPWM(servonum, 0, SERVO_REV);
-    delay(200); // Wait for 2 seconds
+    delay(20); // Wait for 2 seconds
     pwm.setPWM(servonum, 0, SERVO_STOP);
-    delay(200); // Wait for 2 seconds
+    delay(20); // Wait for 2 seconds
   }
-  else {
+  else if (servo_dir == 3) {
     pwm.setPWM(servonum, 0, SERVO_STOP);
-    delay(200); // Wait for 2 seconds
+    delay(20); // Wait for 2 seconds
   }
   // pwm.setPWM(servonum, 0, SERVO_FWD);
   // delay(200); // Wait for 2 seconds
@@ -100,11 +100,11 @@ void moveServo(uint8_t servonum, uint8_t servo_dir) {
   // delay(200); // Wait for 2 seconds
 }
 
-void moveServosSequentially() {
-  for (uint8_t servonum = 0; servonum < 4; servonum++) {
-    moveServo(servonum);
-  }
-}
+// void moveServosSequentially() {
+//   for (uint8_t servonum = 0; servonum < 4; servonum++) {
+//     moveServo(servonum);
+//   }
+// }
 
 void loop() {
   if (autostate == false) {
@@ -123,7 +123,7 @@ if (GamePad.isDownPressed())
   {
     Serial.print("Down");
     
-    moveServo(2, 1)
+    moveServo(2, 1);
       delay(100);
 
   }

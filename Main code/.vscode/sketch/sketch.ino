@@ -73,17 +73,17 @@ float getDistance(int trigPin, int echoPin)
 
 void moveServo(int servo, int distanceSensor, int backupSensor)
 {
-    float absolute = abs(abs(startingDistances[distanceSensor] - distances[distanceSensor]) - abs(distances[backupSensor] - startingDistances[backupSensor]));
-
-    // If positive it is closer if negative it is further away
-    float movement1 = startingDistances[distanceSensor] - distances[distanceSensor];
-
-    float movement2 = startingDistances[backupSensor] - distances[backupSensor];
-
-    // This checks that the position has moved 4cm from it's original position
+        float absolute = abs(abs(startingDistances[distanceSensor] - distances[distanceSensor]) - abs(distances[backupSensor] - startingDistances[backupSensor]));
+        
+        //If positive it is closer if negative it is further away
+        float movement1 = startingDistances[distanceSensor] - distances[distanceSensor];
+        
+        float movement2 = startingDistances[backupSensor] - distances[backupSensor];
+       
+       //This checks that the position has moved 3cm from it's original position
     if (movement1 > 4)
     {
-        // This checks if the sensor 
+       
         if (movement2 < 3)
         {
             Serial.print("This is running on servo: ");

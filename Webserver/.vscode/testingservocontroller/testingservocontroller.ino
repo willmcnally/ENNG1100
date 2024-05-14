@@ -19,12 +19,16 @@ void setup() {
 
 void moveServo(uint8_t servonum) {
   pwm.setPWM(servonum, 0, SERVO_FWD);
+  Serial.println("forward");
   delay(200); // Wait for 2 seconds
   pwm.setPWM(servonum, 0, SERVO_STOP);
+  Serial.println("stop");
   delay(200); // Wait for 2 seconds
   pwm.setPWM(servonum, 0, SERVO_REV);
+  Serial.println("reverse");
   delay(200); // Wait for 2 seconds
   pwm.setPWM(servonum, 0, SERVO_STOP);
+  Serial.println("stop");
   delay(200); // Wait for 2 seconds
 }
 

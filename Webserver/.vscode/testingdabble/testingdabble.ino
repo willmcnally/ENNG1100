@@ -33,7 +33,7 @@ Servo servo0;
 // Servo servos[] = {servo0, servo1, servo2, servo3};
 Servo servos[] = {servo0};
 // const int servoPins[] = {23, 19, 5, 18};
-const int servoPins[] = {23};
+// const int servoPins[] = {23};
 
 // long duration;
 // float startingDistances[] = {0, 0, 0, 0};
@@ -76,19 +76,19 @@ void setup() {
 void moveServo(uint8_t servonum, uint8_t servo_dir) {
   if (servo_dir == 1) {
     pwm.setPWM(servonum, 0, SERVO_FWD);
-    delay(20); // Wait for 2 seconds
+    delay(200); // Wait for 2 seconds
     pwm.setPWM(servonum, 0, SERVO_STOP);
-    delay(20); // Wait for 2 seconds
+    delay(10); // Wait for 2 seconds
   }
   else if (servo_dir == 2) {
     pwm.setPWM(servonum, 0, SERVO_REV);
-    delay(20); // Wait for 2 seconds
+    delay(200); // Wait for 2 seconds
     pwm.setPWM(servonum, 0, SERVO_STOP);
-    delay(20); // Wait for 2 seconds
+    delay(10); // Wait for 2 seconds
   }
   else if (servo_dir == 3) {
     pwm.setPWM(servonum, 0, SERVO_STOP);
-    delay(20); // Wait for 2 seconds
+    delay(10); // Wait for 2 seconds
   }
   // pwm.setPWM(servonum, 0, SERVO_FWD);
   // delay(200); // Wait for 2 seconds

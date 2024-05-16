@@ -21,8 +21,8 @@
 #define SERVO_FWD msToPulseLen(2.0)   // This is the 'forward' pulse length count (out of 4096)
 #define SERVO_REV msToPulseLen(1.0)   // This is the 'reverse' pulse length count (out of 4096)
 #define SOUND_SPEED 0.034
-// const int trigPins[] = {19, 23};
-// const int echoPins[] = {21, 22};
+const int trigPins[] = {19, 23};
+const int echoPins[] = {21, 22};
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x44);
 
@@ -35,9 +35,9 @@ Servo servos[] = {servo0};
 // const int servoPins[] = {23, 19, 5, 18};
 // const int servoPins[] = {23};
 
-// long duration;
-// float startingDistances[] = {0, 0, 0, 0};
-// float distances[] = {0, 0, 0, 0};
+long duration;
+float startingDistances[] = {0, 0, 0, 0};
+float distances[] = {0, 0, 0, 0};
 bool autostate = false;
 
 uint16_t msToPulseLen(float ms)
@@ -53,15 +53,15 @@ void setup()
   // put your setup code here, to run once:
   Serial.begin(115200);       // make sure your Serial Monitor is also set at this baud rate.
   Dabble.begin("BLUECHEESE"); // set bluetooth name of your device
-  //   for (int i = 0; i < sizeof(trigPins) / sizeof(trigPins[0]); i++)
-  //     {
-  //         pinMode(trigPins[i], OUTPUT); // Sets the trigPin as an Output
-  //         pinMode(echoPins[i], INPUT);  // Sets the echoPin as an Input
+  for (int i = 0; i < sizeof(trigPins) / sizeof(trigPins[0]); i++)
+  {
+    pinMode(trigPins[i], OUTPUT); // Sets the trigPin as an Output
+    pinMode(echoPins[i], INPUT);  // Sets the echoPin as an Input
 
-  //         duration = pulseIn(echoPins[i], HIGH);
+    duration = pulseIn(echoPins[i], HIGH);
 
-  //         startingDistances[i] = duration * SOUND_SPEED / 2;
-  // }
+    startingDistances[i] = duration * SOUND_SPEED / 2;
+  }
   // Initialises servos
   // for (int i = 0; i < sizeof(servos) / sizeof(servos[0]); i++)
   //   {
@@ -96,27 +96,63 @@ void moveServo(uint8_t servonum, uint8_t servo_dir)
     pwm.setPWM(servonum, 0, SERVO_STOP);
     delay(10); // Wait for 2 seconds
   }
-  // pwm.setPWM(servonum, 0, SERVO_FWD);
-  // delay(200); // Wait for 2 seconds
-  // pwm.setPWM(servonum, 0, SERVO_STOP);
-  // delay(200); // Wait for 2 seconds
-  // pwm.setPWM(servonum, 0, SERVO_REV);
-  // delay(200); // Wait for 2 seconds
-  // pwm.setPWM(servonum, 0, SERVO_STOP);
-  // delay(200); // Wait for 2 seconds
 }
 
-// void moveServosSequentially() {
-//   for (uint8_t servonum = 0; servonum < 4; servonum++) {
-//     moveServo(servonum);
-//   }
-// }
+float getDistance(int trigPin, int echoPin)
+{
+  // Clears the trigPin
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+  // Calculate the distance
+  return duration * SOUND_SPEED / 2;
+}
+
+void moveServoAUTO(uint8_t servonum, int distanceSensor, int backupSensor)
+{
+  float absolute = abs(abs(startingDistances[distanceSensor] - distances[distanceSensor]) - abs(distances[backupSensor] - startingDistances[backupSensor]));
+
+  // If positive it is closer if negative it is further away
+  float movement1 = startingDistances[distanceSensor] - distances[distanceSensor];
+
+  float movement2 = startingDistances[backupSensor] - distances[backupSensor];
+
+  // This checks that the position has moved 3cm from it's original position
+  if (movement1 > 4)
+  {
+
+    if (movement2 < 3)
+    {
+      Serial.print("This is running on servo: ");
+      Serial.print(servonum);
+      Serial.println();
+      moveServo(servonum, 1); // move forward
+      delay(500);
+    }
+    else
+    {
+      moveServo(servonum, 3); // stop
+      delay(500);
+    }
+  }
+
+  else
+  {
+    moveServo(servonum, 3); // stop
+    delay(10);
+  }
+}
 
 void loop()
 {
+  Dabble.processInput(); // this function is used to refresh data obtained from smartphone.Hence calling this function is mandatory in order to get data properly from your mobile.
   if (autostate == false)
   {
-    Dabble.processInput(); // this function is used to refresh data obtained from smartphone.Hence calling this function is mandatory in order to get data properly from your mobile.
     Serial.print("KeyPressed: ");
     if (GamePad.isUpPressed())
     {
@@ -192,148 +228,32 @@ void loop()
       Serial.print("Select");
       autostate = !autostate;
     }
-    //formatting for the serial prints
+    // formatting for the serial prints
     Serial.print('\t');
     Serial.println();
   }
 
-  else if (autostate == true){
-    //code to change the autostate function, which should switch between servos's on/off <|:3
-    if (GamePad.isSelectPressed())
+  else if (autostate == true)
+  {
+    Serial.print("Entering Auto Mode");
+    Serial.println();
+    // code to change the autostate function, which should switch between servos's on/off <|:3
+    if (GamePad.isStartPressed())
     {
       Serial.print("Activated Manual Mode");
       autostate = !autostate;
     }
+
+    for (int i = 0; i < sizeof(trigPins) / sizeof(trigPins[0]); i++) // ngl i dunno wtf this code does but it works i guess
+    {
+      distances[i] = getDistance(trigPins[i], echoPins[i]);
+    }
+    // this should move the servos automatically. hopefully
+    moveServoAUTO(0, 0, 1);
+    moveServoAUTO(1, 1, 0);
+    moveServoAUTO(2, 2, 3);
+    moveServoAUTO(3, 3, 2);
+
+    delay(10);
   }
 }
-// void move_servo_man(int servoNum, bool direction) {
-//   if (direction == true) {
-
-//   servos[servoNum].writeMicroseconds(2000);
-//     delay(100);
-//   }
-//   else{
-//     servos[servoNum].writeMicroseconds(1000);
-//     delay(100);
-//   }
-//   // for (int i = 0; i < 4; i++)
-//   //   {
-//   //     if (i != servoNum) {
-
-//   //       servos[i].writeMicroseconds(1500);
-//   //       delay(100);
-//   //     }
-//   //   }
-
-// }
-//
-// if (autostate == true) {
-//   for (int i = 0; i < sizeof(trigPins) / sizeof(trigPins[0]); i++)
-//     {
-//         distances[i] = getDistance(trigPins[i], echoPins[i]);
-//     }
-//     moveServo(0, 0, 1);
-//     moveServo(1, 1, 0);
-//     moveServo(2, 2, 3);
-//     moveServo(3, 3, 2);
-//     delay(10);
-//
-// }
-//
-// //
-// float getDistance(int trigPin, int echoPin)
-// {
-//     // Clears the trigPin
-//     digitalWrite(trigPin, LOW);
-//     delayMicroseconds(2);
-//     // Sets the trigPin on HIGH state for 10 micro seconds
-//     digitalWrite(trigPin, HIGH);
-//     delayMicroseconds(10);
-//     digitalWrite(trigPin, LOW);
-//     // Reads the echoPin, returns the sound wave travel time in microseconds
-//     duration = pulseIn(echoPin, HIGH);
-//     // Calculate the distance
-//     return duration * SOUND_SPEED / 2;
-// }
-//
-// void moveServo(int servo, int distanceSensor, int backupSensor)
-// {
-//     float absolute = abs(abs(startingDistances[distanceSensor] - distances[distanceSensor]) - abs(distances[backupSensor] - startingDistances[backupSensor]));
-//
-//     // If positive it is closer if negative it is further away
-//     float movement1 = startingDistances[distanceSensor] - distances[distanceSensor];
-//
-//     float movement2 = startingDistances[backupSensor] - distances[backupSensor];
-//
-//     // This checks that the position has moved 3cm from it's original position
-//     if (movement1 > 4)
-//     {
-//
-//         if (movement2 < 3)
-//         {
-//             Serial.print("This is running on servo: ");
-//             Serial.print(servo);
-//             Serial.println();
-//             servos[servo].writeMicroseconds(2000);
-//             delay(500);
-//         }
-//         else
-//         {
-//             servos[servo].writeMicroseconds(1500);
-//             delay(500);
-//         }
-//     }
-//
-//     else
-//     {
-//         servos[servo].writeMicroseconds(1500);
-//         delay(10);
-//     }
-// }
-//
-// this code is very shit dunno what im doing with it
-// void move_servo_manual() {
-//   Dabble.processInput();             //this function is used to refresh data obtained from smartphone.Hence calling this function is mandatory in order to get data properly from your mobile.
-//   // Code to wind the servos manually
-//   if (GamePad.isUpPressed())
-//   {
-//     servos[0].writeMicroseconds(2000);
-//     delay(500);
-//   }
-//   if (GamePad.isRightPressed())
-//   {
-//     servos[1].writeMicroseconds(2000);
-//     delay(500);
-//   }
-//   if (GamePad.isDownPressed())
-//   {
-//     servos[2].writeMicroseconds(2000);
-//     delay(500);
-//   }
-//   if (GamePad.isLeftPressed())
-//   {
-//     servos[3].writeMicroseconds(2000);
-//     delay(500);
-//   }
-//   // Code to unwind the servos manually
-//   if (GamePad.isTrianglePressed())
-//   {
-//     servos[0].writeMicroseconds(1000);
-//     delay(500);
-//   }
-//   if (GamePad.isCirclePressed())
-//   {
-//     servos[1].writeMicroseconds(1000);
-//     delay(500);
-//   }
-//   if (GamePad.isCrossPressed())
-//   {
-//     servos[2].writeMicroseconds(1000);
-//     delay(500);
-//   }
-//   if (GamePad.isSquarePressed())
-//   {
-//     servos[3].writeMicroseconds(1000);
-//     delay(500);
-//   }
-// }
